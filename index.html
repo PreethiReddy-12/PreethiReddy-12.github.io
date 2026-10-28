@@ -189,7 +189,7 @@
   .hc-b2 { right: -16px; top: -18px; animation-delay: -2.5s; }
   @keyframes floaty { 50% { transform: translateY(-8px); } }
 
-  /* Bugsy: a chibi puppy that sits up, tilts its head and chats; it bounces if it ever walks */
+  /* Jimmy: a chibi puppy that sits up, tilts its head and chats; it bounces if it ever walks */
   .pet { position: fixed; left: 0; top: 0; z-index: 39; width: 108px; height: 74px; touch-action: none; user-select: none; -webkit-user-select: none; will-change: transform; }
   .pet-body { width: 100%; height: 100%; cursor: grab; transition: transform .25s; }
   .pet.left .pet-body { transform: scaleX(-1); }
@@ -224,11 +224,14 @@
   .pet .eye { transform-box: fill-box; transform-origin: center; animation: blinkEye 4.5s infinite; }
   @keyframes blinkEye { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
   /* sitting: back legs fold into a rounded thigh with a tucked paw; front legs stay straight */
+  /* keep the name tag readable when Jimmy faces left */
+  .pet .tag text { transform-box: fill-box; transform-origin: center; }
+  .pet.left .tag text { transform: scaleX(-1); }
   .pet .haunch { opacity: 0; transition: opacity .2s; }
   .pet.sit .haunch { opacity: 1; }
   .pet.sit .lb1, .pet.sit .lb2 { opacity: 0; }
   .pet.sit .lf1, .pet.sit .lf2 { transform: rotate(16deg); }
-  /* keep the speech bubble on screen when Bugsy is near an edge */
+  /* keep the speech bubble on screen when Jimmy is near an edge */
   .pet.edge-l .pet-bubble { left: 0; transform: scale(.6); transform-origin: 20% 100%; }
   .pet.edge-l .pet-bubble.on { transform: scale(1); }
   .pet.edge-l .pet-bubble::after { left: 46px; }
@@ -1105,9 +1108,9 @@
 
 <button class="totop" id="totop" aria-label="Back to top">↑</button>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<div class="pet" id="pet" role="img" aria-label="Bugsy, a small dog. Drag it anywhere to place it, click it to hear it talk, double-click to send it back to the floor, or close it." hidden>
+<div class="pet" id="pet" role="img" aria-label="Jimmy, a small dog. Drag it anywhere to place it, click it to hear it talk, double-click to send it back to the floor, or close it." hidden>
   <div class="pet-bubble" id="petBubble" aria-live="polite"></div>
-  <button class="pet-close" id="petClose" aria-label="Hide Bugsy" title="Hide Bugsy">×</button>
+  <button class="pet-close" id="petClose" aria-label="Hide Jimmy" title="Hide Jimmy">×</button>
   <div class="pet-body" id="petBody">
     <svg class="dog" viewBox="0 0 88 58" aria-hidden="true">
       <path class="tail" d="M20 32 C13 30 11.5 22 15.5 18" fill="none" stroke="#e3a35e" stroke-width="5" stroke-linecap="round"/>
@@ -1119,8 +1122,12 @@
       <ellipse cx="33" cy="28.5" rx="7.5" ry="4.5" fill="#e3a35e"/>
       <g class="haunch"><ellipse cx="27" cy="38" rx="9.5" ry="8.5" fill="#fff4e3" stroke="#ecd3ad" stroke-width="1"/><ellipse cx="33.5" cy="46.5" rx="6" ry="3" fill="#f3dcb9"/></g>
       <g class="head">
-        <path class="collar" d="M51 33.5 q9 4 18 -1" fill="none" stroke="var(--a1)" stroke-width="3.4" stroke-linecap="round"/>
-        <circle cx="60" cy="37" r="2.3" fill="#fbbf24" stroke="#d97706" stroke-width=".6"/>
+        <path class="collar" d="M50.5 33 q9.5 4.5 19 -1" fill="none" stroke="var(--a1)" stroke-width="4.2" stroke-linecap="round"/>
+        <g class="tag">
+          <circle cx="60.5" cy="36.4" r="1.2" fill="#fbbf24" stroke="#d97706" stroke-width=".4"/>
+          <rect x="50.5" y="37.2" width="20" height="7.8" rx="2.6" fill="var(--a1)" stroke="#fff" stroke-width=".7"/>
+          <text x="60.5" y="42.9" text-anchor="middle" font-size="5.2" font-weight="800" letter-spacing=".3" fill="var(--accent-ink)" font-family="Inter, system-ui, sans-serif">JIMMY</text>
+        </g>
         <path class="ear" d="M52.5 9.5 C45 10 43.5 23 47.5 30 C52 29.5 54.8 20 55.6 13 Z" fill="#c9824a"/>
         <circle cx="63" cy="20" r="14" fill="#fff4e3" stroke="#ecd3ad" stroke-width="1"/>
         <ellipse cx="70.5" cy="15.5" rx="6" ry="5.4" fill="#e3a35e"/>
@@ -1777,7 +1784,7 @@ ${body}`;
       [['whoami', 'who I am'], ['skills', 'what I work with'], ['projects', 'things I have built and tested'], ['experience', 'my internship'],
        ['education', 'where I studied'], ['contact', 'how to reach me'], ['hire', 'the best command'], ['cv', 'download my CV'],
        ['open <name>', 'github, linkedin or instagram'], ['theme', 'switch dark / light'], ['color <name>', Object.keys(accentNames).join(', ')],
-       ['pet', 'show or hide Bugsy the dog'], ['clear', 'clear the screen']].forEach(([c, d]) => row(c, `<span class="c-mute">${d}</span>`));
+       ['pet', 'show or hide Jimmy the dog'], ['clear', 'clear the screen']].forEach(([c, d]) => row(c, `<span class="c-mute">${d}</span>`));
     },
     whoami() {
       out('Preethi A R');
@@ -1830,7 +1837,7 @@ ${body}`;
       setAccent(arg, true); out(`Colour mood set to ${accentNames[arg]}.`);
     },
     colour(arg) { cmds.color(arg); },
-    pet() { setPet(pet.hidden, true); out(pet.hidden ? 'Bugsy is taking a nap.' : 'Bugsy is back, tail wagging.'); },
+    pet() { setPet(pet.hidden, true); out(pet.hidden ? 'Jimmy is taking a nap.' : 'Jimmy is back, tail wagging.'); },
     ls() { out('about.txt  projects/  skills.json  resume.pdf'); },
     cat(arg) { ({ 'about.txt': cmds.whoami, 'skills.json': cmds.skills, 'resume.pdf': () => out('<span class="c-mute">binary file. Try: cv</span>') }[arg] || (() => out(`<span class="c-warn">cat: ${escT(arg || '')}: no such file</span>`)))(); },
     sudo() { out('<span class="c-warn">Permission denied.</span> Hire me to get admin access.'); },
@@ -1872,7 +1879,7 @@ ${body}`;
   // ---------- walking dog ----------
   const pet = document.getElementById('pet'), petBubble = document.getElementById('petBubble'), petClose = document.getElementById('petClose');
   // the dog introduces itself first, then only talks about Preethi
-  const petIntro = "Hii! I'm Bugsy, Preethi's companion";
+  const petIntro = "Hi, I am Jimmy, Preethi's companion";
   const petLines = ['Preethi has a B.E. in AI & ML', 'She graduated with a CGPA of 8.9!', 'She interned at Electrobtech Innovations',
     'She tests with Playwright, Postman & JMeter', 'She builds Python apps with Generative AI', 'Her Medical Scribe was a Top 6 Docathon finalist',
     'She finds bugs before users do', 'She runs security scans with OWASP ZAP', 'She built a sign language recognition system',
@@ -1914,10 +1921,10 @@ ${body}`;
       if (!v.floor) { petState.perched = true; petState.mode = 'sit'; petState.dir = v.dir || 1; petState.y = Math.min(Math.max(v.fy * innerHeight, 0), ground()); }
     } catch (e) {}
   }
-  function petSay(text) {
+  function petSay(text, ms = 2200) {
     petBubble.textContent = text || nextPetLine();
     petBubble.classList.add('on'); pet.classList.add('show-x');
-    clearTimeout(bubbleT); bubbleT = setTimeout(() => { petBubble.classList.remove('on'); pet.classList.remove('show-x'); }, 2200);
+    clearTimeout(bubbleT); bubbleT = setTimeout(() => { petBubble.classList.remove('on'); pet.classList.remove('show-x'); }, ms);
   }
   function petDraw() {
     pet.style.transform = `translate(${petState.x}px, ${petState.y}px)`;
@@ -1949,7 +1956,7 @@ ${body}`;
           if (petState.x >= max) { petState.x = max; petState.dir = -1; }
         }
       }
-      // Bugsy chats on its own every 7-12s while the visitor is active, walking or sitting
+      // Jimmy chats on its own every 7-12s while the visitor is active, walking or sitting
       if (t < petActiveUntil) {
         if (!petState.nextChat) petState.nextChat = t + 4000;
         if (t >= petState.nextChat) { if (!petBubble.classList.contains('on')) petSay(); petState.nextChat = t + 7000 + Math.random() * 5000; }
@@ -1970,7 +1977,7 @@ ${body}`;
     pet.hidden = !on;
     try { localStorage.setItem('pet', on ? 'on' : 'off'); } catch (e) {}
     if (on) { petStart(); if (announce) petSay(petIntro); }
-    else { petStop(); if (announce) toast('Bugsy is hidden. Bring it back from the Ctrl K menu.'); }
+    else { petStop(); if (announce) toast('Jimmy is hidden. Bring it back from the Ctrl K menu.'); }
   }
   // drag anywhere; a tap without moving makes it talk
   pet.addEventListener('pointerdown', e => {
@@ -2016,6 +2023,8 @@ ${body}`;
   pet.hidden = petPref === 'off'; if (!pet.hidden) petLoad();
   petWake();
   setPet(petPref !== 'off', false);
+  // greet the visitor for the first 10 seconds after the page opens
+  if (!pet.hidden) { petIntroduced = true; petSay(petIntro, 10000); petState.nextChat = performance.now() + 13000; }
 
   // command palette (Ctrl/⌘ K)
   const palette = document.getElementById('palette'), palInput = document.getElementById('palInput'), palList = document.getElementById('palList');
@@ -2034,7 +2043,7 @@ ${body}`;
     ['', 'Build the demo app', 'Action', () => { setMode('dev'); goTo('playground')(); setTimeout(() => buildBtn.click(), 500); }],
     ['', 'Run the demo tests', 'Action', () => { setMode('test'); goTo('playground')(); setTimeout(() => runBtn.click(), 500); }],
     ['', 'Find a bug (demo)', 'Action', () => { setMode('test'); goTo('playground')(); setTimeout(() => bugBtn.click(), 500); }],
-    ['', 'Show / hide Bugsy the dog', 'Action', () => setPet(pet.hidden, true)],
+    ['', 'Show / hide Jimmy the dog', 'Action', () => setPet(pet.hidden, true)],
     ['', 'Copy email address', 'Action', copyEmail],
     ['', 'Open the terminal', 'Action', () => { setMode('cli'); goTo('playground')(); setTimeout(() => cliIn.focus({ preventScroll: true }), 600); }],
     ['', 'Write me a message', 'Action', () => { goTo('contact')(); setTimeout(() => cmName.focus({ preventScroll: true }), 600); }],
