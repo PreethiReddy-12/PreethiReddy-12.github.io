@@ -189,12 +189,20 @@
   .hc-b2 { right: -16px; top: -18px; animation-delay: -2.5s; }
   @keyframes floaty { 50% { transform: translateY(-8px); } }
 
-  /* walking dog */
-  .pet { position: fixed; left: 0; top: 0; z-index: 39; width: 72px; height: 50px; touch-action: none; user-select: none; -webkit-user-select: none; will-change: transform; }
+  /* Bugsy: a chibi puppy that sits up, tilts its head and chats; it bounces if it ever walks */
+  .pet { position: fixed; left: 0; top: 0; z-index: 39; width: 108px; height: 74px; touch-action: none; user-select: none; -webkit-user-select: none; will-change: transform; }
   .pet-body { width: 100%; height: 100%; cursor: grab; transition: transform .25s; }
   .pet.left .pet-body { transform: scaleX(-1); }
   .pet .dog { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 6px 6px rgba(0,0,0,.25)); }
-  .pet .leg { fill: #a0673a; transform-box: fill-box; transform-origin: 50% 10%; }
+  .pet.walk .dog { animation: bob .25s ease-in-out infinite alternate; }
+  @keyframes bob { to { transform: translateY(-2px); } }
+  .pet .head { transform-box: fill-box; transform-origin: 40% 85%; }
+  /* sitting: body leans back on its haunches, the head stays upright and tilts now and then */
+  .pet .dog { transition: transform .3s ease; }
+  .pet.sit .dog { transform: rotate(-16deg); transform-origin: 32% 92%; }
+  .pet.sit .head { animation: tilt 2.6s ease-in-out infinite; }
+  @keyframes tilt { 0%, 60%, 100% { transform: rotate(14deg); } 75% { transform: rotate(4deg); } }
+  .pet .leg { fill: #f3dcb9; transform-box: fill-box; transform-origin: 50% 10%; }
   .pet.walk .lb1, .pet.walk .lf2 { animation: stepA .5s ease-in-out infinite; }
   .pet.walk .lb2, .pet.walk .lf1 { animation: stepB .5s ease-in-out infinite; }
   @keyframes stepA { 50% { transform: rotate(22deg); } }
@@ -202,9 +210,9 @@
   .pet .tail { transform-box: fill-box; transform-origin: 90% 95%; animation: tail .7s ease-in-out infinite; }
   .pet.walk .tail { animation-duration: .45s; }
   .pet.happy .tail { animation-duration: .18s; }
-  .pet .ear { transform-box: fill-box; transform-origin: 70% 5%; }
+  .pet .ear { transform-box: fill-box; transform-origin: 50% 8%; }
   .pet.walk .ear { animation: flop .5s ease-in-out infinite; }
-  @keyframes flop { 50% { transform: rotate(8deg); } }
+  @keyframes flop { 50% { transform: rotate(10deg); } }
   .pet .tongue { opacity: 0; transition: opacity .15s; }
   .pet.happy .tongue, .pet.sit .tongue { opacity: 1; }
   .pet.happy .pet-body { animation: hop .45s cubic-bezier(.3,1.6,.5,1); }
@@ -215,7 +223,18 @@
   @keyframes tail { 50% { transform: rotate(-16deg); } }
   .pet .eye { transform-box: fill-box; transform-origin: center; animation: blinkEye 4.5s infinite; }
   @keyframes blinkEye { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
-  .pet.sit .lb1, .pet.sit .lb2 { transform: rotate(60deg) translateY(-2px); }
+  /* sitting: back legs fold into a rounded thigh with a tucked paw; front legs stay straight */
+  .pet .haunch { opacity: 0; transition: opacity .2s; }
+  .pet.sit .haunch { opacity: 1; }
+  .pet.sit .lb1, .pet.sit .lb2 { opacity: 0; }
+  .pet.sit .lf1, .pet.sit .lf2 { transform: rotate(16deg); }
+  /* keep the speech bubble on screen when Bugsy is near an edge */
+  .pet.edge-l .pet-bubble { left: 0; transform: scale(.6); transform-origin: 20% 100%; }
+  .pet.edge-l .pet-bubble.on { transform: scale(1); }
+  .pet.edge-l .pet-bubble::after { left: 46px; }
+  .pet.edge-r .pet-bubble { left: auto; right: 0; transform: scale(.6); transform-origin: 80% 100%; }
+  .pet.edge-r .pet-bubble.on { transform: scale(1); }
+  .pet.edge-r .pet-bubble::after { left: auto; right: 40px; margin-left: 0; }
   .pet.drag .pet-body { cursor: grabbing; transform: rotate(-8deg); }
   .pet.drag.left .pet-body { transform: scaleX(-1) rotate(-8deg); }
   .pet.drag .leg { animation: dangle .35s ease-in-out infinite alternate; }
@@ -340,13 +359,15 @@
 
   /* about */
   .about { display: grid; grid-template-columns: 360px 1fr; gap: 60px; align-items: start; }
-  .portrait { aspect-ratio: 4/5; border: 1px solid var(--line); border-radius: 8px; position: relative; overflow: hidden; background: var(--bg-2); }
-  .portrait img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 15%; transition: transform .8s ease; }
+  /* the photo is a cutout with no box, so it sits straight on the page in any theme; the bottom fades into the page */
+  .portrait { aspect-ratio: 4/5; position: relative; }
+  .portrait img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 15%; transition: transform .8s ease;
+    -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent); mask-image: linear-gradient(to bottom, #000 72%, transparent); }
   .portrait:hover img { transform: scale(1.04); }
-  .portrait::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(12,12,11,.8), transparent 40%); pointer-events: none; }
-  .portrait .cap { position: absolute; left: 16px; right: 16px; bottom: 14px; z-index: 2; display: flex; justify-content: space-between; align-items: end; }
-  .portrait .cap .it { font-size: 44px; color: #c8f169; line-height: 1; }
-  .portrait .cap .mono { color: #7ee08a; }
+  .portrait .cap { position: absolute; left: 0; right: 0; bottom: 6px; z-index: 2; display: flex; justify-content: center; align-items: end; }
+  .portrait .cap .mono { background: var(--glass); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; }
+  .portrait .cap .it { font-size: 44px; color: var(--accent); line-height: 1; }
+  .portrait .cap .mono { color: var(--text); }
   .bio p { font-size: clamp(19px, 2vw, 25px); line-height: 1.45; letter-spacing: -.01em; margin-bottom: 20px; }
   .bio p.small { font-size: 16px; color: var(--muted); line-height: 1.75; }
   .bio p em { color: var(--accent); }
@@ -720,7 +741,7 @@
       <div class="sh rv"><div class="num">01 — About me</div><div><h2>Curious, careful,<br><em>always learning.</em></h2></div></div>
       <div class="about">
         <div class="portrait rv">
-          <img src="photo.jpg" alt="Portrait of Preethi A R">
+          <img src="photo-cutout.webp" alt="Portrait of Preethi A R">
           <div class="cap"><span class="mono">● Bengaluru, Karnataka, India</span></div>
         </div>
         <div class="bio rv">
@@ -1084,31 +1105,35 @@
 
 <button class="totop" id="totop" aria-label="Back to top">↑</button>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<div class="pet" id="pet" role="img" aria-label="A small dog. Drag it anywhere to place it, click it to hear it talk, double-click to send it back to the floor, or close it." hidden>
+<div class="pet" id="pet" role="img" aria-label="Bugsy, a small dog. Drag it anywhere to place it, click it to hear it talk, double-click to send it back to the floor, or close it." hidden>
   <div class="pet-bubble" id="petBubble" aria-live="polite"></div>
-  <button class="pet-close" id="petClose" aria-label="Hide the dog" title="Hide the dog">×</button>
+  <button class="pet-close" id="petClose" aria-label="Hide Bugsy" title="Hide Bugsy">×</button>
   <div class="pet-body" id="petBody">
     <svg class="dog" viewBox="0 0 88 58" aria-hidden="true">
-      <path class="tail" d="M17 29 C9 25 8 16 12 9" fill="none" stroke="#a0673a" stroke-width="5" stroke-linecap="round"/>
-      <rect class="leg lb1" x="20" y="36" width="6.5" height="15" rx="3.2"/>
-      <rect class="leg lb2" x="29" y="36" width="6.5" height="15" rx="3.2"/>
-      <rect class="leg lf1" x="47" y="36" width="6.5" height="15" rx="3.2"/>
-      <rect class="leg lf2" x="56" y="36" width="6.5" height="15" rx="3.2"/>
-      <ellipse cx="40" cy="32" rx="25" ry="12.5" fill="#c98a52"/>
-      <ellipse cx="43" cy="38" rx="15" ry="5" fill="#e8c69c"/>
-      <ellipse cx="28" cy="27" rx="7" ry="5.5" fill="#a0673a" opacity=".55"/>
+      <path class="tail" d="M20 32 C13 30 11.5 22 15.5 18" fill="none" stroke="#e3a35e" stroke-width="5" stroke-linecap="round"/>
+      <rect class="leg lb1" x="23" y="38" width="7" height="12" rx="3.5"/>
+      <rect class="leg lb2" x="31" y="38" width="7" height="12" rx="3.5"/>
+      <rect class="leg lf1" x="42" y="38" width="7" height="12" rx="3.5"/>
+      <rect class="leg lf2" x="50" y="38" width="7" height="12" rx="3.5"/>
+      <ellipse cx="39" cy="34" rx="20" ry="10.5" fill="#fff4e3" stroke="#ecd3ad" stroke-width="1"/>
+      <ellipse cx="33" cy="28.5" rx="7.5" ry="4.5" fill="#e3a35e"/>
+      <g class="haunch"><ellipse cx="27" cy="38" rx="9.5" ry="8.5" fill="#fff4e3" stroke="#ecd3ad" stroke-width="1"/><ellipse cx="33.5" cy="46.5" rx="6" ry="3" fill="#f3dcb9"/></g>
       <g class="head">
-        <path class="collar" d="M55 27.5 q6 5.5 13.5 3" fill="none" stroke="var(--a1)" stroke-width="3.2" stroke-linecap="round"/>
-        <circle cx="62" cy="33" r="2" fill="#fbbf24"/>
-        <circle cx="64" cy="20" r="11.5" fill="#c98a52"/>
-        <ellipse cx="75" cy="24.5" rx="8" ry="5.6" fill="#e8c69c"/>
-        <ellipse cx="81.5" cy="22.6" rx="2.6" ry="2.1" fill="#2a1d17"/>
-        <path d="M76 28.6 q2.4 1.8 5 0" stroke="#5a3a26" stroke-width="1" fill="none" stroke-linecap="round"/>
-        <path class="tongue" d="M77.2 29.4 q1.4 4.6 3.6 0 z" fill="#ef7f92"/>
-        <circle class="eye" cx="62" cy="17.5" r="1.9" fill="#1d1d24"/>
-        <circle class="eye" cx="69" cy="17.5" r="1.9" fill="#1d1d24"/>
-        <circle cx="62.6" cy="16.9" r=".6" fill="#fff"/><circle cx="69.6" cy="16.9" r=".6" fill="#fff"/>
-        <path class="ear" d="M57 10 C50 10 48.5 21 52.5 29 C56 27.5 59 19.5 59.5 12.5 Z" fill="#7a4a2a"/>
+        <path class="collar" d="M51 33.5 q9 4 18 -1" fill="none" stroke="var(--a1)" stroke-width="3.4" stroke-linecap="round"/>
+        <circle cx="60" cy="37" r="2.3" fill="#fbbf24" stroke="#d97706" stroke-width=".6"/>
+        <path class="ear" d="M52.5 9.5 C45 10 43.5 23 47.5 30 C52 29.5 54.8 20 55.6 13 Z" fill="#c9824a"/>
+        <circle cx="63" cy="20" r="14" fill="#fff4e3" stroke="#ecd3ad" stroke-width="1"/>
+        <ellipse cx="70.5" cy="15.5" rx="6" ry="5.4" fill="#e3a35e"/>
+        <path class="ear" d="M72.5 8.5 C79.5 8.5 82.5 20 79 27.5 C75 27 72.5 19 72 12.5 Z" fill="#c9824a"/>
+        <ellipse cx="66" cy="28" rx="7" ry="4.6" fill="#ffffff"/>
+        <ellipse cx="55.5" cy="25" rx="3" ry="1.8" fill="#ffa3b5" opacity=".7"/>
+        <ellipse cx="74.5" cy="25" rx="3" ry="1.8" fill="#ffa3b5" opacity=".7"/>
+        <g class="eye"><ellipse cx="58.5" cy="20" rx="2.9" ry="3.4" fill="#231a1a"/><circle cx="59.6" cy="18.6" r="1.2" fill="#fff"/><circle cx="57.7" cy="21.4" r=".55" fill="#fff"/></g>
+        <g class="eye"><ellipse cx="69.5" cy="20" rx="2.9" ry="3.4" fill="#231a1a"/><circle cx="70.6" cy="18.6" r="1.2" fill="#fff"/><circle cx="68.7" cy="21.4" r=".55" fill="#fff"/></g>
+        <ellipse cx="64" cy="25.6" rx="2.6" ry="1.9" fill="#3b2a26"/>
+        <ellipse cx="63.3" cy="25" rx=".8" ry=".5" fill="#fff" opacity=".7"/>
+        <path d="M64 27.4 q-1.4 2 -3.2 .9 M64 27.4 q1.4 2 3.2 .9" fill="none" stroke="#3b2a26" stroke-width="1" stroke-linecap="round"/>
+        <path class="tongue" d="M62.6 28.6 q1.4 4.4 2.8 0 z" fill="#ef7f92"/>
       </g>
     </svg>
   </div>
@@ -1752,7 +1777,7 @@ ${body}`;
       [['whoami', 'who I am'], ['skills', 'what I work with'], ['projects', 'things I have built and tested'], ['experience', 'my internship'],
        ['education', 'where I studied'], ['contact', 'how to reach me'], ['hire', 'the best command'], ['cv', 'download my CV'],
        ['open <name>', 'github, linkedin or instagram'], ['theme', 'switch dark / light'], ['color <name>', Object.keys(accentNames).join(', ')],
-       ['pet', 'show or hide the dog'], ['clear', 'clear the screen']].forEach(([c, d]) => row(c, `<span class="c-mute">${d}</span>`));
+       ['pet', 'show or hide Bugsy the dog'], ['clear', 'clear the screen']].forEach(([c, d]) => row(c, `<span class="c-mute">${d}</span>`));
     },
     whoami() {
       out('Preethi A R');
@@ -1805,7 +1830,7 @@ ${body}`;
       setAccent(arg, true); out(`Colour mood set to ${accentNames[arg]}.`);
     },
     colour(arg) { cmds.color(arg); },
-    pet() { setPet(pet.hidden, true); out(pet.hidden ? 'The dog is taking a nap.' : 'The dog is back, tail wagging.'); },
+    pet() { setPet(pet.hidden, true); out(pet.hidden ? 'Bugsy is taking a nap.' : 'Bugsy is back, tail wagging.'); },
     ls() { out('about.txt  projects/  skills.json  resume.pdf'); },
     cat(arg) { ({ 'about.txt': cmds.whoami, 'skills.json': cmds.skills, 'resume.pdf': () => out('<span class="c-mute">binary file. Try: cv</span>') }[arg] || (() => out(`<span class="c-warn">cat: ${escT(arg || '')}: no such file</span>`)))(); },
     sudo() { out('<span class="c-warn">Permission denied.</span> Hire me to get admin access.'); },
@@ -1846,10 +1871,16 @@ ${body}`;
 
   // ---------- walking dog ----------
   const pet = document.getElementById('pet'), petBubble = document.getElementById('petBubble'), petClose = document.getElementById('petClose');
-  const petLines = ['Woof! Hi there!', 'Hire Preethi!', 'She writes great bug reports', 'Try the Terminal tab', 'Drag me around!',
-    'Have you seen her projects?', 'Fetch her CV!', 'I sniffed out a bug once', 'Pat me again?', 'She tests AND builds', 'Woof woof!', 'Good choice visiting!', 'Put me anywhere you like', 'Double-click me to jump down', 'I walk when you scroll'];
-  let petOrder = [], petNext = 0;
+  // the dog introduces itself first, then only talks about Preethi
+  const petIntro = "Hii! I'm Bugsy, Preethi's companion";
+  const petLines = ['Preethi has a B.E. in AI & ML', 'She graduated with a CGPA of 8.9!', 'She interned at Electrobtech Innovations',
+    'She tests with Playwright, Postman & JMeter', 'She builds Python apps with Generative AI', 'Her Medical Scribe was a Top 6 Docathon finalist',
+    'She finds bugs before users do', 'She runs security scans with OWASP ZAP', 'She built a sign language recognition system',
+    'She is a Smile Foundation scholar', 'She tests AND builds', 'She is open to work. Hire Preethi!', 'She is based in Bengaluru',
+    'Her CV is worth a read!', 'She knows SQL and PostgreSQL too'];
+  let petOrder = [], petNext = 0, petIntroduced = false;
   function nextPetLine() {
+    if (!petIntroduced) { petIntroduced = true; return petIntro; }
     if (petNext >= petOrder.length) {
       const last = petOrder[petOrder.length - 1];
       petOrder = petLines.map((_, i) => i).sort(() => Math.random() - .5);
@@ -1866,8 +1897,10 @@ ${body}`;
   const PET_IDLE_MS = 15000;
   const petWake = () => { petActiveUntil = performance.now() + PET_IDLE_MS; };
   ['pointermove', 'pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(ev => addEventListener(ev, petWake, { passive: true }));
+  let petScrollUntil = 0;
   addEventListener('scroll', () => {
     petWake();
+    petScrollUntil = performance.now() + 900;
     const d = scrollY - petLastY; petLastY = scrollY;
     if (d && !petState.perched && !petState.dragging) petState.dir = d > 0 ? 1 : -1;   // scroll down walks right, up walks left
   }, { passive: true });
@@ -1889,6 +1922,8 @@ ${body}`;
   function petDraw() {
     pet.style.transform = `translate(${petState.x}px, ${petState.y}px)`;
     pet.classList.toggle('low-room', petState.y < 70);
+    pet.classList.toggle('edge-l', petState.x < 130);
+    pet.classList.toggle('edge-r', petState.x > innerWidth - petW() - 130);
     pet.classList.toggle('left', petState.dir < 0);
     pet.classList.toggle('walk', petState.mode === 'walk' && !petState.dragging);
     pet.classList.toggle('sit', petState.mode === 'sit' && !petState.dragging);
@@ -1902,17 +1937,22 @@ ${body}`;
       } else if (petState.falling || petState.vy) {
         // jumping back down to the floor, with a small bounce
         petState.vy += 2200 * dt; petState.y += petState.vy * dt;
-        if (petState.y >= g) { petState.y = g; petState.vy = Math.abs(petState.vy) > 260 ? -petState.vy * .32 : 0; if (!petState.vy) { petState.falling = false; petSay('Back on the floor!'); petSave(); } }
+        if (petState.y >= g) { petState.y = g; petState.vy = Math.abs(petState.vy) > 260 ? -petState.vy * .32 : 0; if (!petState.vy) { petState.falling = false; petSay(); petSave(); } }
       } else {
         petState.y = g;
-        // walk while the visitor is active, sit and wag when they've been idle for a while
-        petState.mode = t < petActiveUntil ? 'walk' : 'sit';
+        // walk while the visitor is scrolling, sit as soon as they stop
+        petState.mode = t < petScrollUntil ? 'walk' : 'sit';
         if (petState.mode === 'walk') {
           petState.x += petState.dir * 70 * dt;
           const max = innerWidth - petW() - 6;
           if (petState.x <= 6) { petState.x = 6; petState.dir = 1; }
           if (petState.x >= max) { petState.x = max; petState.dir = -1; }
         }
+      }
+      // Bugsy chats on its own every 7-12s while the visitor is active, walking or sitting
+      if (t < petActiveUntil) {
+        if (!petState.nextChat) petState.nextChat = t + 4000;
+        if (t >= petState.nextChat) { if (!petBubble.classList.contains('on')) petSay(); petState.nextChat = t + 7000 + Math.random() * 5000; }
       }
     }
     petDraw();
@@ -1929,8 +1969,8 @@ ${body}`;
   function setPet(on, announce) {
     pet.hidden = !on;
     try { localStorage.setItem('pet', on ? 'on' : 'off'); } catch (e) {}
-    if (on) { petStart(); if (announce) petSay('I\'m back!'); }
-    else { petStop(); if (announce) toast('Dog hidden. Bring it back from the Ctrl K menu.'); }
+    if (on) { petStart(); if (announce) petSay(petIntro); }
+    else { petStop(); if (announce) toast('Bugsy is hidden. Bring it back from the Ctrl K menu.'); }
   }
   // drag anywhere; a tap without moving makes it talk
   pet.addEventListener('pointerdown', e => {
@@ -1955,17 +1995,17 @@ ${body}`;
     if (!petState.moved) { petSay(); pet.classList.remove('happy'); void pet.offsetWidth; pet.classList.add('happy'); clearTimeout(petHappyT); petHappyT = setTimeout(() => pet.classList.remove('happy'), 900); }
     else if (petState.y > ground() - 40) {
       petState.perched = false; petState.y = ground(); petState.mode = 'sit';
-      petSay('Back to walking!'); petDraw(); petSave();
+      petSay(); petDraw(); petSave();
     } else {
-      petState.perched = true; petState.mode = 'sit'; petSay("I'll wait here!"); petDraw(); petSave();
+      petState.perched = true; petState.mode = 'sit'; petSay(); petDraw(); petSave();
     }
   };
   // double-click: jump back down to the floor
   pet.addEventListener('dblclick', e => {
     if (e.target.closest('.pet-close') || !petState.perched) return;
     petState.perched = false; petState.mode = 'sit';
-    if (reduce) { petState.y = ground(); petDraw(); petSay('Back on the floor!'); petSave(); }
-    else { petState.falling = true; petState.vy = -200; petSay('Wheee!'); }
+    if (reduce) { petState.y = ground(); petDraw(); petSay(); petSave(); }
+    else { petState.falling = true; petState.vy = -200; petSay(); }
   });
   pet.addEventListener('pointerup', petRelease);
   pet.addEventListener('pointercancel', petRelease);
@@ -1994,7 +2034,7 @@ ${body}`;
     ['', 'Build the demo app', 'Action', () => { setMode('dev'); goTo('playground')(); setTimeout(() => buildBtn.click(), 500); }],
     ['', 'Run the demo tests', 'Action', () => { setMode('test'); goTo('playground')(); setTimeout(() => runBtn.click(), 500); }],
     ['', 'Find a bug (demo)', 'Action', () => { setMode('test'); goTo('playground')(); setTimeout(() => bugBtn.click(), 500); }],
-    ['', 'Show / hide the dog', 'Action', () => setPet(pet.hidden, true)],
+    ['', 'Show / hide Bugsy the dog', 'Action', () => setPet(pet.hidden, true)],
     ['', 'Copy email address', 'Action', copyEmail],
     ['', 'Open the terminal', 'Action', () => { setMode('cli'); goTo('playground')(); setTimeout(() => cliIn.focus({ preventScroll: true }), 600); }],
     ['', 'Write me a message', 'Action', () => { goTo('contact')(); setTimeout(() => cmName.focus({ preventScroll: true }), 600); }],
